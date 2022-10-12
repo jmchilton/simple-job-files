@@ -29,6 +29,7 @@ def exercise_server(application_url, target_path: Path):
 
 def test_app(tmp_path: Path):
     if TEST_EXTERNAL_APPLICATION_URL:
+        # docker run -it  -v /private/var/folders/:/private/var/folders/ -p 10010:8000 galaxy/simple-job-files
         exercise_server(TEST_EXTERNAL_APPLICATION_URL, tmp_path)
     else:
         app = JobFilesApp(tmp_path, allow_multiple_downloads=False)
