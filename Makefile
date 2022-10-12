@@ -14,8 +14,8 @@ SOURCE_DIR?=simplejobfiles
 BUILD_SCRIPTS_DIR=scripts
 DEV_RELEASE?=0
 VERSION?=$(shell DEV_RELEASE=$(DEV_RELEASE) python $(BUILD_SCRIPTS_DIR)/print_version_for_release.py $(SOURCE_DIR) $(DEV_RELEASE))
-PROJECT_URL?=https://github.com/jmchilton/pydantic-tes
-PROJECT_NAME?=pydantic-tes
+PROJECT_URL?=https://github.com/jmchilton/simple-job-files
+PROJECT_NAME?=simple-job-files
 TEST_DIR?=tests
 
 .PHONY: clean-pyc clean-build clean
