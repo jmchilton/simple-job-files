@@ -1,4 +1,4 @@
-from os import makedirs
+from os import environ, makedirs
 from os.path import (
     dirname,
     exists,
@@ -13,11 +13,12 @@ from webob import (
 )
 
 BUFFER_SIZE = 4096
+JOB_FILES_ROOT_DIRECTORY = environ.get("JOB_FILES_ROOT_DIRECTORY", None)
 
 
 class JobFilesApp:
 
-    def __init__(self, root_directory=None, allow_multiple_downloads=False):
+    def __init__(self, root_directory=JOB_FILES_ROOT_DIRECTORY, allow_multiple_downloads=False):
         self.root_directory = root_directory
         self.served_files = []
         self.allow_multiple_downloads = allow_multiple_downloads

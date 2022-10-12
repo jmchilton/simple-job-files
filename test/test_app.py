@@ -1,4 +1,5 @@
 import io
+import os
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -6,6 +7,8 @@ import requests
 from webtest.http import StopableWSGIServer
 
 from simplejobfiles.app import JobFilesApp
+
+TEST_EXTERNAL_APPLICATION_URL = os.environ.get("TEST_EXTERNAL_APPLICATION_URL", None)
 
 
 def exercise_server(application_url, target_path: Path):
@@ -25,10 +28,13 @@ def exercise_server(application_url, target_path: Path):
 
 
 def test_app(tmp_path: Path):
-    app = JobFilesApp(tmp_path, allow_multiple_downloads=False)
-    with server_for_test_app(app) as server:
-        url = server.application_url
-        exercise_server(url, tmp_path)
+    if TEST_EXTERNAL_APPLICATION_URL:
+        exercise_server(TEST_EXTERNAL_APPLICATION_URL, tmp_path)
+    else:
+        app = JobFilesApp(tmp_path, allow_multiple_downloads=False)
+        with server_for_test_app(app) as server:
+            url = server.application_url
+            exercise_server(url, tmp_path)
 
 
 @contextmanager
