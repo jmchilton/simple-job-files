@@ -1,0 +1,19 @@
+name: Test
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.10']
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+          python3 -m pip install --upgrade pip setuptools
+          pip install -rrequirements.txt -rdev-requirements.txt
+    - name: Test with tox
+      run: pytest -s test
