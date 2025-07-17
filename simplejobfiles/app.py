@@ -3,6 +3,7 @@ from os.path import (
     dirname,
     exists,
 )
+from urllib.parse import unquote
 
 # Too big a dependency for just this...
 from galaxy.util import in_directory
@@ -36,7 +37,7 @@ class JobFilesApp:
         return resp(environ, start_response)
 
     def _post(self, request, params):
-        path = params['path']
+        path = unquote(params['path'])
         if not in_directory(path, self.root_directory):
             raise AssertionError("{} not in {}".format(path, self.root_directory))
         parent_directory = dirname(path)
@@ -46,7 +47,7 @@ class JobFilesApp:
         return Response(body='')
 
     def _get(self, request, params):
-        path = params['path']
+        path = unquote(params['path'])
         if path in self.served_files and not self.allow_multiple_downloads:  # emulate Galaxy not allowing the same request twice...
             raise Exception("Same file copied multiple times...")
         if not in_directory(path, self.root_directory):
