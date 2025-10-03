@@ -2,6 +2,7 @@ from os import environ, makedirs
 from os.path import (
     dirname,
     exists,
+    getsize,
 )
 from urllib.parse import unquote, urljoin
 
@@ -34,12 +35,14 @@ class JobFilesApp:
             resp = self._put(req, params)
         elif method == "GET":
             resp = self._get(req, params)
+        elif method == "HEAD":
+            resp = self._head(req, params)
         else:
             raise Exception("Unhandled request method %s" % method)
         return resp(environ, start_response)
 
     def _post(self, request, params):
-        path = params['path']
+        path = unquote(params['path'])
         if not in_directory(path, self.root_directory):
             raise AssertionError("{} not in {}".format(path, self.root_directory))
         parent_directory = dirname(path)
@@ -49,7 +52,7 @@ class JobFilesApp:
         return Response(body='')
 
     def _get(self, request, params):
-        path = params['path']
+        path = unquote(params['path'])
         if path in self.served_files and not self.allow_multiple_downloads:  # emulate Galaxy not allowing the same request twice...
             raise Exception("Same file copied multiple times...")
         if not in_directory(path, self.root_directory):
@@ -65,7 +68,16 @@ class JobFilesApp:
         if not exists(parent_directory):
             makedirs(parent_directory)
         _copy_to_path(request.body_file, path)
-        return Response(status=201, headers={'Location': urljoin(request.path_url, path)})
+        return Response(status=201, headers={'Location': urljoin(request.path_url, path)
+
+    def _head(self, request, params):
+        path = unquote(params['path'])
+        if path in self.served_files and not self.allow_multiple_downloads:
+            # emulate Galaxy not allowing the same request twice...
+            raise Exception("Same file copied multiple times...")
+        if not in_directory(path, self.root_directory):
+            raise AssertionError("{} not in {}".format(path, self.root_directory))
+        return _file_header(path)
 
 
 def _copy_to_path(object, path):
@@ -91,6 +103,15 @@ def _file_response(path):
     resp = Response()
     if exists(path):
         resp.app_iter = _FileIterator(path)
+    else:
+        raise exc.HTTPNotFound("No file found with path %s." % path)
+    return resp
+
+
+def _file_header(path):
+    resp = Response()
+    if exists(path):
+        resp.content_length = getsize(path)
     else:
         raise exc.HTTPNotFound("No file found with path %s." % path)
     return resp
