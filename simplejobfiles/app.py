@@ -4,7 +4,7 @@ from os.path import (
     exists,
     getsize,
 )
-from urllib.parse import unquote
+from urllib.parse import unquote, urljoin
 
 # Too big a dependency for just this...
 from galaxy.util import in_directory
@@ -31,6 +31,8 @@ class JobFilesApp:
         method = req.method
         if method == "POST":
             resp = self._post(req, params)
+        elif method == "PUT":
+            resp = self._put(req, params)
         elif method == "GET":
             resp = self._get(req, params)
         elif method == "HEAD":
@@ -57,6 +59,16 @@ class JobFilesApp:
             raise AssertionError("{} not in {}".format(path, self.root_directory))
         self.served_files.append(path)
         return _file_response(path)
+
+    def _put(self, request, params):
+        path = unquote(params['path'])
+        if not in_directory(path, self.root_directory):
+            raise AssertionError("{} not in {}".format(path, self.root_directory))
+        parent_directory = dirname(path)
+        if not exists(parent_directory):
+            makedirs(parent_directory)
+        _copy_to_path(request.body_file, path)
+        return Response(status=201, headers={'Location': urljoin(request.path_url, path)
 
     def _head(self, request, params):
         path = unquote(params['path'])
