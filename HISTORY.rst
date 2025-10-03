@@ -9,7 +9,8 @@ History
 0.2.0.dev0
 ---------------------
 
-    
+* Various updates to support migrating to the Galaxy job files to Fast API
+  (thanks to @kysrpex).
 
 ---------------------
 0.1.1 (2022-10-12)
