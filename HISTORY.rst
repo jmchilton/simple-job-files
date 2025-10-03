@@ -6,7 +6,7 @@ History
 .. to_doc
 
 ---------------------
-0.2.0.dev0
+0.2.0 (2025-10-03)
 ---------------------
 
 * Various updates to support migrating to the Galaxy job files to Fast API
