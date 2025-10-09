@@ -41,7 +41,7 @@ class JobFilesApp:
             raise Exception("Unhandled request method %s" % method)
         return resp(environ, start_response)
 
-    def _post(self, request, params):
+    def _post(self, request: Request, params):
         path = unquote(params['path'])
         if not in_directory(path, self.root_directory):
             raise AssertionError("{} not in {}".format(path, self.root_directory))
@@ -51,7 +51,7 @@ class JobFilesApp:
         _copy_to_path(params["file"].file, path)
         return Response(body='')
 
-    def _get(self, request, params):
+    def _get(self, request: Request, params):
         path = unquote(params['path'])
         if path in self.served_files and not self.allow_multiple_downloads:  # emulate Galaxy not allowing the same request twice...
             raise Exception("Same file copied multiple times...")
@@ -60,7 +60,7 @@ class JobFilesApp:
         self.served_files.append(path)
         return _file_response(path)
 
-    def _put(self, request, params):
+    def _put(self, request: Request, params):
         path = unquote(params['path'])
         if not in_directory(path, self.root_directory):
             raise AssertionError("{} not in {}".format(path, self.root_directory))
@@ -68,9 +68,9 @@ class JobFilesApp:
         if not exists(parent_directory):
             makedirs(parent_directory)
         _copy_to_path(request.body_file, path)
-        return Response(status=201, headers={'Location': urljoin(request.path_url, path)
+        return Response(status=201, headerlist=[("Location", urljoin(request.path_url, path))])
 
-    def _head(self, request, params):
+    def _head(self, request: Request, params):
         path = unquote(params['path'])
         if path in self.served_files and not self.allow_multiple_downloads:
             # emulate Galaxy not allowing the same request twice...
