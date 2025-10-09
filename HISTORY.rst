@@ -6,7 +6,7 @@ History
 .. to_doc
 
 ---------------------
-0.2.1.dev0
+0.2.1 (2025-10-09)
 ---------------------
 
 * Fix recent API changes for Pulsar tests - thanks to @nsoranzo.
